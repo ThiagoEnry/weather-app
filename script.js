@@ -1,39 +1,36 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #eef2f7;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-.container {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  width: 320px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
+const apiKey = 27822e5419b49a50f83d004af8706c97;
 
-.search {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
+const cityInput = document.getElementById("cityInput");
+const searchBtn = document.getElementById("searchBtn");
+const weatherResult = document.getElementById("weatherResult");
 
-input {
-  flex: 1;
-  padding: 8px;
-}
+searchBtn.addEventListener("click", getWeather);
 
-button {
-  padding: 8px 12px;
-  cursor: pointer;
-}
+async function getWeather() {
+  const city = cityInput.value.trim();
+  if (city === "") return;
 
-.weather p {
-  margin: 5px 0;
-  font-size: 16px;
-}
+  weatherResult.innerHTML = "Loading...";
 
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=en`
+    );
+
+    if (!response.ok) {
+      throw new Error("City not found");
+    }
+
+    const data = await response.json();
+
+    weatherResult.innerHTML = `
+      <p><strong>${data.name}</strong></p>
+      <p>Temperature: ${data.main.temp} °C</p>
+      <p>Weather: ${data.weather[0].description}</p>
+      <p>Humidity: ${data.main.humidity}%</p>
+    `;
+  } catch (error) {
+    weatherResult.innerHTML = "City not found ❌";
+  }
+}
